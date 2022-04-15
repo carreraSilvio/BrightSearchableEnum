@@ -1,0 +1,13 @@
+{
+  "name": "com.brightsearchableenum",
+  "version": "1.0.0",
+  "displayName": "Bright Searchable Enum",
+  "description": "Attribute that shows a search box for an enum",
+  "unity": "2020.3",
+  "unityRelease": "28f1",
+  "author": 
+  {
+    "name": "Silvio Carrera",
+    "url": "https://github.com/carreraSilvio/BrightSearchableEnum"
+  }
+}

@@ -1,0 +1,18 @@
+{
+    "name": "BrightSearchableEnumEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b7c122bba3d2a324d9ea963b6a037a69"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
