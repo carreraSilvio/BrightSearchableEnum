@@ -3,61 +3,64 @@ using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-public class EnumSearchWindowProvider : ScriptableObject, ISearchWindowProvider
+namespace BrightSearchableEnum
 {
-    private Enum _enumTarget;
-    private Action<Enum> _onSelectEntryCallback;
-    private Type _enumType;
-
-    public EnumSearchWindowProvider(Type enumType, Action<Enum> onSelectEntryHandler)
+    public class EnumSearchWindowProvider : ScriptableObject, ISearchWindowProvider
     {
-        _enumType = enumType;
-        _onSelectEntryCallback = onSelectEntryHandler;
-    }
+        private Enum _enumTarget;
+        private Action<Enum> _onSelectEntryCallback;
+        private Type _enumType;
 
-    public void Set(Type enumType, Action<Enum> onSelectEntryHandler)
-    {
-        _enumType = enumType;
-        _onSelectEntryCallback = onSelectEntryHandler;
-    }
-
-    public void Set(Enum enumTarget, Action<Enum> onSelectEntryHandler)
-    {
-        _enumTarget = enumTarget;
-        _onSelectEntryCallback = onSelectEntryHandler;
-    }
-
-    public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context)
-    {
-        if(_enumTarget == null && _enumType == null)
+        public EnumSearchWindowProvider(Type enumType, Action<Enum> onSelectEntryHandler)
         {
-            return new List<SearchTreeEntry>();
+            _enumType = enumType;
+            _onSelectEntryCallback = onSelectEntryHandler;
         }
 
-        var enumTypeInUse = _enumTarget != null ? _enumTarget.GetType() : _enumType;
-        var values = Enum.GetValues(enumTypeInUse);
-        var searchList = new List<SearchTreeEntry>
+        public void Set(Type enumType, Action<Enum> onSelectEntryHandler)
+        {
+            _enumType = enumType;
+            _onSelectEntryCallback = onSelectEntryHandler;
+        }
+
+        public void Set(Enum enumTarget, Action<Enum> onSelectEntryHandler)
+        {
+            _enumTarget = enumTarget;
+            _onSelectEntryCallback = onSelectEntryHandler;
+        }
+
+        public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context)
+        {
+            if (_enumTarget == null && _enumType == null)
+            {
+                return new List<SearchTreeEntry>();
+            }
+
+            var enumTypeInUse = _enumTarget != null ? _enumTarget.GetType() : _enumType;
+            var values = Enum.GetValues(enumTypeInUse);
+            var searchList = new List<SearchTreeEntry>
         {
             new SearchTreeGroupEntry(new GUIContent($"{enumTypeInUse.Name}"), 0)
         };
 
-        foreach (var value in values)
-        {
-            SearchTreeEntry treeEntry = new SearchTreeEntry(new GUIContent(value.ToString()))
+            foreach (var value in values)
             {
-                level = 1,
-                userData = value
-            };
-            searchList.Add(treeEntry);
+                SearchTreeEntry treeEntry = new SearchTreeEntry(new GUIContent(value.ToString()))
+                {
+                    level = 1,
+                    userData = value
+                };
+                searchList.Add(treeEntry);
 
+            }
+
+            return searchList;
         }
 
-        return searchList;
-    }
-
-    public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
-    {
-        _onSelectEntryCallback?.Invoke((Enum)SearchTreeEntry.userData);
-        return true;
+        public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
+        {
+            _onSelectEntryCallback?.Invoke((Enum)SearchTreeEntry.userData);
+            return true;
+        }
     }
 }

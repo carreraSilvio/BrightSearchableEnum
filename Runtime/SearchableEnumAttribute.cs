@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
-public class SearchableEnumAttribute : PropertyAttribute
+namespace BrightSearchableEnum
 {
+    public class SearchableEnumAttribute : PropertyAttribute
+    {
+    }
 }

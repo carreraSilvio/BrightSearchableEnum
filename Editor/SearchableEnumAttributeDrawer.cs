@@ -1,56 +1,60 @@
-﻿using System;
+﻿using BrightSearchableEnum;
+using System;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(SearchableEnumAttribute))]
-public class SearchableEnumAttributeDrawer : PropertyDrawer
+namespace BrightSearchableEnumEditor
 {
-    private SerializedProperty _serializedProperty;
-
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    [CustomPropertyDrawer(typeof(SearchableEnumAttribute))]
+    public class SearchableEnumAttributeDrawer : PropertyDrawer
     {
-        _serializedProperty = property;
+        private SerializedProperty _serializedProperty;
 
-        var fullWidth = position.width;
-        var leftWidth = fullWidth * 0.4f;
-        var rightWidth= fullWidth * 0.6f;
-
-        var fields = property.serializedObject.targetObject.GetType().GetFields();
-        Type enumType = null;
-        foreach (var field in fields)
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if(field.Name == property.name)
+            _serializedProperty = property;
+
+            var fullWidth = position.width;
+            var leftWidth = fullWidth * 0.4f;
+            var rightWidth = fullWidth * 0.6f;
+
+            var fields = property.serializedObject.targetObject.GetType().GetFields();
+            Type enumType = null;
+            foreach (var field in fields)
             {
-                enumType = field.FieldType;
-                break;
+                if (field.Name == property.name)
+                {
+                    enumType = field.FieldType;
+                    break;
+                }
+
             }
-            
+
+            if (enumType == null)
+            {
+                return;
+            }
+
+            position.width = leftWidth;
+            GUI.Label(position, $"{property.displayName}");
+            position.x += leftWidth;
+            position.width = rightWidth;
+            if (GUI.Button(position, new GUIContent($"{property.enumDisplayNames[property.enumValueIndex]}"), EditorStyles.popup))
+            {
+                var enumSearchWindowProvider = ScriptableObject.CreateInstance<EnumSearchWindowProvider>();
+                enumSearchWindowProvider.Set(enumType, HandleSelectEntry);
+
+                SearchWindow.Open(
+                    new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)),
+                    enumSearchWindowProvider);
+            }
         }
 
-        if(enumType == null)
+        private void HandleSelectEntry(Enum obj)
         {
-            return;
+            _serializedProperty.enumValueIndex = Convert.ToInt32(obj);
+            _serializedProperty.serializedObject.ApplyModifiedProperties();
         }
-
-        position.width = leftWidth;
-        GUI.Label(position, $"{property.displayName}");
-        position.x += leftWidth;
-        position.width = rightWidth;
-        if (GUI.Button(position, new GUIContent($"{property.enumDisplayNames[property.enumValueIndex]}"), EditorStyles.popup))
-        {
-            var enumSearchWindowProvider = ScriptableObject.CreateInstance<EnumSearchWindowProvider>();
-            enumSearchWindowProvider.Set(enumType, HandleSelectEntry);
-
-            SearchWindow.Open(
-                new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)),
-                enumSearchWindowProvider);
-        }
-    }
-
-    private void HandleSelectEntry(Enum obj)
-    {
-        _serializedProperty.enumValueIndex = Convert.ToInt32(obj);
-        _serializedProperty.serializedObject.ApplyModifiedProperties();
     }
 }
